@@ -101,21 +101,24 @@ class FabCar extends Contract {
         return carAsBytes.toString();
     }
 
-    async inputData(ctx, userId, firstName, lastName, DOB, income, passport) {
+    async inputData(ctx, userId, user) {
         console.log('============= START : Save User Data =========');
 
-        const user = {
-            firstName,
-            lastName,
-            DOB,
-            income,
-            passport,
-        }
+        // const user = {
+        //     ...data
+        // }
 
         // users.push({userId : user});
-        await ctx.stub.putState(userId, Buffer.from(JSON.stringify(user)));
+        await ctx.stub.putState(userId, Buffer.from(JSON.stringify({...user})));
         console.log("======== END : User Data Stored ===========");
     }
+
+    // async approveCompany(ctx, userId, comapanyId) {
+    //     var relations = {};
+    //     relations[comapanyId] = userId;
+
+    //     await ctx.stub.putState(Buffer.from(JSON.stringify(relations)));
+    // }
 
     async createCar(ctx, carNumber, make, model, color, owner) {
         console.info('============= START : Create Car ===========');
