@@ -11,6 +11,7 @@ class FabCar extends Contract {
     async initLedger(ctx) {
         console.info('============= START : Initialize Ledger ===========');
         // const users = [];
+	//test
         const cars = [
             {
                 color: 'blue',
