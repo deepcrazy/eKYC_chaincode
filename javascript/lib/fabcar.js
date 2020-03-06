@@ -82,14 +82,14 @@ class FabCar extends Contract {
         console.info('============= END : Initialize Ledger ===========');
     }
     
-    async getDataIndividual(ctx, userId) {
-        const userAsBytes = await ctx.stub.getState(userId);
-        if (!userAsBytes || userAsBytes.length === 0) {
-            throw new Error(`${userId} does not exist`);
-        }
-        console.log(userAsBytes.toString());
-        return userAsBytes.toString();
-    }
+    // async getDataIndividual(ctx, userId) {
+    //     const userAsBytes = await ctx.stub.getState(userId);
+    //     if (!userAsBytes || userAsBytes.length === 0) {
+    //         throw new Error(`${userId} does not exist`);
+    //     }
+    //     console.log(userAsBytes.toString());
+    //     return userAsBytes.toString();
+    // }
 
     async queryCar(ctx, carNumber) {
         const carAsBytes = await ctx.stub.getState(carNumber); // get the car from chaincode state
