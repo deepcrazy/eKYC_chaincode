@@ -129,7 +129,7 @@ class FabCar extends Contract {
             docType: 'user',
             userDetails,
         };
-        await ctx.stub.putState(userId, Buffer.from(JSON.stringify({user})));
+        await ctx.stub.putState(userId, Buffer.from(JSON.stringify(user)));
         console.log('======== END : User Data Stored ===========');
     }
 
@@ -140,7 +140,7 @@ class FabCar extends Contract {
             docType: 'company',
             companyId,
         };
-        await ctx.stub.putState(companyId, Buffer.from(JSON.stringify({company})));
+        await ctx.stub.putState(companyId, Buffer.from(JSON.stringify(company)));
         console.log('======== END : Company Id Stored ==========');
     }
 
@@ -159,37 +159,40 @@ class FabCar extends Contract {
     //     console.info('============= END : Create Car ===========');
     // }
 
-    // async queryAllCars(ctx) {
-    //     const startKey = 'CAR0';
-    //     const endKey = 'CAR999';
+    async getCompanies(ctx) {
+        const startKey = '1';
+        const endKey = '999';
 
-    //     const iterator = await ctx.stub.getStateByRange(startKey, endKey);
+        const iterator = await ctx.stub.getStateByRange(startKey, endKey);
 
-    //     const allResults = [];
-    //     while (true) {
-    //         const res = await iterator.next();
+        const allResults = [];
+        while (true) {
+            const res = await iterator.next();
+            console.log(`Response: ${res}`);
+            console.log(`Response value: ${res.value.value.toString()}`);
 
-    //         if (res.value && res.value.value.toString()) {
-    //             console.log(res.value.value.toString('utf8'));
+            if (res.value && res.value.value.toString()) {
+                console.log(res.value.value.toString('utf8'));
 
-    //             const Key = res.value.key;
-    //             let Record;
-    //             try {
-    //                 Record = JSON.parse(res.value.value.toString('utf8'));
-    //             } catch (err) {
-    //                 console.log(err);
-    //                 Record = res.value.value.toString('utf8');
-    //             }
-    //             allResults.push({ Key, Record });
-    //         }
-    //         if (res.done) {
-    //             console.log('end of data');
-    //             await iterator.close();
-    //             console.info(allResults);
-    //             return JSON.stringify(allResults);
-    //         }
-    //     }
-    // }
+                const Key = res.value.key;
+                console.log(`Key: ${Key}`);
+                let Record;
+                try {
+                    Record = JSON.parse(res.value.value.toString('utf8'));
+                } catch (err) {
+                    console.log(err);
+                    Record = res.value.value.toString('utf8');
+                }
+                allResults.push({ Key, Record });
+            }
+            if (res.done) {
+                console.log('end of data');
+                await iterator.close();
+                console.info(allResults);
+                return JSON.stringify(allResults);
+            }
+        }
+    }
 
     // async queryAllCars(ctx) {
     //     const startKey = 'CAR0';
