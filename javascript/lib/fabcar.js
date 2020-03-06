@@ -10,8 +10,6 @@ class FabCar extends Contract {
 
     async initLedger(ctx) {
         console.info('============= START : Initialize Ledger ===========');
-        // const users = [];
-	//test
         const cars = [
             {
                 color: 'blue',
@@ -73,6 +71,12 @@ class FabCar extends Contract {
                 model: 'Barina',
                 owner: 'Shotaro',
             },
+	    {
+		color: 'green',
+		make: 'Audi',
+		model: 'A4',
+		owner: 'Deepanshu',
+	    },
         ];
 
         for (let i = 0; i < cars.length; i++) {
@@ -82,15 +86,6 @@ class FabCar extends Contract {
         }
         console.info('============= END : Initialize Ledger ===========');
     }
-    
-    // async getDataIndividual(ctx, userId) {
-    //     const userAsBytes = await ctx.stub.getState(userId);
-    //     if (!userAsBytes || userAsBytes.length === 0) {
-    //         throw new Error(`${userId} does not exist`);
-    //     }
-    //     console.log(userAsBytes.toString());
-    //     return userAsBytes.toString();
-    // }
 
     async queryCar(ctx, carNumber) {
         const carAsBytes = await ctx.stub.getState(carNumber); // get the car from chaincode state
@@ -104,21 +99,18 @@ class FabCar extends Contract {
     async inputData(ctx, userId, user) {
         console.log('============= START : Save User Data =========');
 
-        // const user = {
-        //     ...data
-        // }
+        //const user = {
+        //    firstName,
+        //    lastName,
+        //    DOB,
+        //    income,
+        //    passport,
+        //}
 
         // users.push({userId : user});
-        await ctx.stub.putState(userId, Buffer.from(JSON.stringify({...user})));
+        await ctx.stub.putState(userId, Buffer.from(JSON.stringify({user})));
         console.log("======== END : User Data Stored ===========");
     }
-
-    // async approveCompany(ctx, userId, comapanyId) {
-    //     var relations = {};
-    //     relations[comapanyId] = userId;
-
-    //     await ctx.stub.putState(Buffer.from(JSON.stringify(relations)));
-    // }
 
     async createCar(ctx, carNumber, make, model, color, owner) {
         console.info('============= START : Create Car ===========');
@@ -138,20 +130,33 @@ class FabCar extends Contract {
     async queryAllCars(ctx) {
         const startKey = 'CAR0';
         const endKey = 'CAR999';
+
+        const iterator = await ctx.stub.getStateByRange(startKey, endKey);
+
         const allResults = [];
-        for await (const {key, value} of ctx.stub.getStateByRange(startKey, endKey)) {
-            const strValue = Buffer.from(value).toString('utf8');
-            let record;
-            try {
-                record = JSON.parse(strValue);
-            } catch (err) {
-                console.log(err);
-                record = strValue;
+        while (true) {
+            const res = await iterator.next();
+
+            if (res.value && res.value.value.toString()) {
+                console.log(res.value.value.toString('utf8'));
+
+                const Key = res.value.key;
+                let Record;
+                try {
+                    Record = JSON.parse(res.value.value.toString('utf8'));
+                } catch (err) {
+                    console.log(err);
+                    Record = res.value.value.toString('utf8');
+                }
+                allResults.push({ Key, Record });
             }
-            allResults.push({ Key: key, Record: record });
+            if (res.done) {
+                console.log('end of data');
+                await iterator.close();
+                console.info(allResults);
+                return JSON.stringify(allResults);
+            }
         }
-        console.info(allResults);
-        return JSON.stringify(allResults);
     }
 
     async changeCarOwner(ctx, carNumber, newOwner) {
@@ -167,7 +172,6 @@ class FabCar extends Contract {
         await ctx.stub.putState(carNumber, Buffer.from(JSON.stringify(car)));
         console.info('============= END : changeCarOwner ===========');
     }
-
 
 }
 
