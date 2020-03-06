@@ -169,21 +169,29 @@ class FabCar extends Contract {
         while (true) {
             const res = await iterator.next();
             console.log(`Response: ${res}`);
-            console.log(`Response value: ${res.value.value.toString()}`);
 
             if (res.value && res.value.value.toString()) {
-                console.log(res.value.value.toString('utf8'));
+                console.log(`Response value: ${res.value.value.toString('utf8')}`);
+                console.log(`DocType value: ${res.value.value.toString('utf8').docType}`);
+                // console.log(res.value.value.toString('utf8'));
+                // '{"docType":"user","userDetails":"{firstName:xPaul,lastName:xTest,DOB:238232,income:3121,passport:1232131}"}'.split(',')[0].includes('\"docType\":\"user\"')
 
-                const Key = res.value.key;
-                console.log(`Key: ${Key}`);
-                let Record;
-                try {
-                    Record = JSON.parse(res.value.value.toString('utf8'));
-                } catch (err) {
-                    console.log(err);
-                    Record = res.value.value.toString('utf8');
+                for (let i=0; i < res.value.value.toString('utf8').split(',').length; i++) {
+
+                    if (res.value.value.toString('utf8').split(',')[i].includes('"docType":"company"')) {
+                        const Key = res.value.key;
+                        console.log(`Key: ${Key}`);
+                        let Record;
+                        try {
+                            Record = JSON.parse(res.value.value.toString('utf8'));
+                        } catch (err) {
+                            console.log(err);
+                            Record = res.value.value.toString('utf8');
+                        }
+                        allResults.push({ Key, Record });
+                        break;
+                    }
                 }
-                allResults.push({ Key, Record });
             }
             if (res.done) {
                 console.log('end of data');
