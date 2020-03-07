@@ -201,46 +201,14 @@ class FabCar extends Contract {
     // }
 
     async getCompanies(ctx) {
-        const startKey = '1';
-        const endKey = '999';
 
-        const iterator = await ctx.stub.getStateByRange(startKey, endKey);
-
-        const allResults = [];
-        while (true) {
-            const res = await iterator.next();
-            console.log(`Response: ${res}`);
-
-            if (res.value && res.value.value.toString()) {
-                console.log(`Response value: ${res.value.value.toString('utf8')}`);
-                console.log(`DocType value: ${res.value.value.toString('utf8').docType}`);
-                // console.log(res.value.value.toString('utf8'));
-                // '{"docType":"user","userDetails":"{firstName:xPaul,lastName:xTest,DOB:238232,income:3121,passport:1232131}"}'.split(',')[0].includes('\"docType\":\"user\"')
-
-                for (let i=0; i < res.value.value.toString('utf8').split(',').length; i++) {
-
-                    if (res.value.value.toString('utf8').split(',')[i].includes('"docType":"company"')) {
-                        const Key = res.value.key;
-                        console.log(`Key: ${Key}`);
-                        let Record;
-                        try {
-                            Record = JSON.parse(res.value.value.toString('utf8'));
-                        } catch (err) {
-                            console.log(err);
-                            Record = res.value.value.toString('utf8');
-                        }
-                        allResults.push({ Key, Record });
-                        break;
-                    }
-                }
-            }
-            if (res.done) {
-                console.log('end of data');
-                await iterator.close();
-                console.info(allResults);
-                return JSON.stringify(allResults);
-            }
+        const companies_list_id = 'companies_list_id';
+        const companiesAsBytes = await ctx.stub.getState(companies_list_id);    //  get the companies list from the chaincode state
+        if (!companiesAsBytes || companiesAsBytes.length === 0) {
+            throw new Error('Companies list is empty.');
         }
+        console.log(`Companies list: ${JSON.parse(companiesAsBytes)}`);
+        return JSON.parse(companiesAsBytes);
     }
 
     async getRelations(ctx, id) {
