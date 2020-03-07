@@ -233,9 +233,13 @@ class FabCar extends Contract {
             console.log(`response range: ${responseRange.value.key}`);
             console.log(`response range string: ${responseRange.value.key.toString('utf8')}`);
             Record = responseRange.value.key.toString('utf8');
-            relations.push({id, Record});
-            console.log(`Relations: ${relations}`);
-            return JSON.stringify(relations);
+            relations.push({company, Record});
+
+            if (responseRange.done) {
+                console.log('end of data');
+                console.log(`Relations: ${relations}`);
+                return JSON.stringify(relations);
+            }
         }
 
     }
