@@ -133,6 +133,21 @@ class FabCar extends Contract {
         console.log('======== END : User Data Stored ===========');
     }
 
+    async approveCompany(ctx, userId, companyId) {
+        console.log('======== START : Approve company for user data access ==========');
+        let indexName = 'company~user';
+        let companyUserIndexKey = await ctx.stub.createCompositeKey(indexName, [companyId.toString(), userId.toString()]);
+        if (!companyUserIndexKey) {
+            throw new Error(' Failed to create the createCompositeKey');
+        }
+
+        console.log(companyUserIndexKey);
+
+        //  Note - passing a 'nil' value will effectively delete the key from state, therefore we pass null character as value
+        await ctx.stub.putState(companyUserIndexKey, Buffer.from('\u0000'));
+        console.log('======== END : Relation of approved companies for users stored =========');
+    }
+
     async saveCompany(ctx, companyId) {
         console.log('=========== START : Save Company Data ===========');
 
