@@ -166,11 +166,13 @@ class FabCar extends Contract {
         const companiesAsBytes = await ctx.stub.getState(companies_list_id);    //  get the user from the chaincode state
         if (!companiesAsBytes || companiesAsBytes.length === 0) {
             const companyObj = {list: [companyID]};
+            console.log(`check: ${JSON.stringify(companyObj)}`);
             await ctx.stub.putState(companies_list_id, Buffer.from(JSON.stringify(companyObj)));
         }
-        let companyObj = JSON.parse(companiesAsBytes.toString());
 
         console.log(`Companies as bytes: ${companiesAsBytes.toString()}`);
+        let companyObj = JSON.parse(companiesAsBytes);
+
         console.log(`Companies Obj: ${companyObj}`);
         // return userAsBytes.toString();
 
