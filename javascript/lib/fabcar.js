@@ -228,18 +228,19 @@ class FabCar extends Contract {
             let Record;
             let responseRange = await coloredMarbleResultsIterator.next();
             if (!responseRange || !responseRange.value || !responseRange.value.key) {
-                return;
+                console.log('end of data');
+                console.log(`Relations: ${relations}`);
+                return JSON.stringify(relations);
             }
+
             console.log(`response range: ${responseRange.value.key}`);
             console.log(`response range string: ${responseRange.value.key.toString('utf8')}`);
             Record = responseRange.value.key.toString('utf8');
             relations.push({company, Record});
 
-            if (responseRange.done) {
-                console.log('end of data');
-                console.log(`Relations: ${relations}`);
-                return JSON.stringify(relations);
-            }
+            // if (responseRange.done) {
+            //     return;
+            // }
         }
 
     }
