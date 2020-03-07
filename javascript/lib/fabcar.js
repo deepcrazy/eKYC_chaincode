@@ -223,18 +223,19 @@ class FabCar extends Contract {
         }
     }
 
-    async getRelations(ctx, companyID) {
+    async getRelations(ctx, id) {
 
-        let companyUserResultsIterator = await ctx.stub.getStateByPartialCompositeKey('company~user', [companyID.toString()]);
+        let relations = 'id1~id2';
+        let relationResultsIterator = await ctx.stub.getStateByPartialCompositeKey(relations, [id.toString()]);
 
-        let relations = [];
+        let relationsArray = [];
         while (true) {
             // let Record;
-            let responseRange = await companyUserResultsIterator.next();
+            let responseRange = await relationResultsIterator.next();
             if (!responseRange || !responseRange.value || !responseRange.value.key) {
                 console.log('end of data');
-                console.log(`Relations: ${relations}`);
-                return JSON.stringify(relations);
+                console.log(`relationsArray: ${relationsArray}`);
+                return JSON.stringify(relationsArray);
             }
 
             console.log(`response range: ${responseRange.value.key}`);
@@ -246,15 +247,12 @@ class FabCar extends Contract {
                 attributes
             } = await ctx.stub.splitCompositeKey(responseRange.value.key));
 
-            let companyId = attributes[0];
-            let userId = attributes[1];
+            // let id1 = attributes[0];   //  ID1 param of the relation
+            let id2 = attributes[1];         //  ID2 param of the relation
             console.log(`Index Type: ${objectType}`);
             // Record = responseRange.value.key.toString('utf8');
-            relations.push({companyId, userId});
+            relationsArray.push(id2);
 
-            // if (responseRange.done) {
-            //     return;
-            // }
         }
 
     }
