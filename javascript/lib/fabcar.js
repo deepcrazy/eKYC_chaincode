@@ -154,14 +154,31 @@ class FabCar extends Contract {
         console.log('======== END : Relation of approved companies for users stored =========');
     }
 
-    async saveCompany(ctx, companyId) {
+    async saveCompany(ctx, companyID) {
         console.log('=========== START : Save Company Data ===========');
 
-        const company = {
-            docType: 'company',
-            companyId,
-        };
-        await ctx.stub.putState(companyId, Buffer.from(JSON.stringify(company)));
+        const companies_list_id = 'companies_list_id';
+        // const companyId = {
+        //     docType: 'company',
+        //     companyID,
+        // };
+
+        const companiesAsBytes = await ctx.stub.getState(companies_list_id);    //  get the user from the chaincode state
+        if (!companiesAsBytes || companiesAsBytes.length === 0) {
+            const companyObj = {list: [companyID]};
+            await ctx.stub.putState(companies_list_id, Buffer.from(JSON.stringify(companyObj)));
+        }
+        let companyObj = JSON.parse(companiesAsBytes.toString());
+
+        console.log(`Companies as bytes: ${companiesAsBytes.toString()}`);
+        console.log(`Companies Obj: ${companyObj}`);
+        // return userAsBytes.toString();
+
+        companyObj.list.push(companyID);
+        console.log(`Updated Companies Obj: ${companyObj}`);
+
+        // await ctx.stub.putState(companyId, Buffer.from(JSON.stringify(company)));
+        await ctx.stub.putState(companies_list_id, Buffer.from(JSON.stringify(companyObj)));
         console.log('======== END : Company Id Stored ==========');
     }
 
