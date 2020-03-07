@@ -225,7 +225,7 @@ class FabCar extends Contract {
 
         let relations = [];
         while (true) {
-            let Record;
+            // let Record;
             let responseRange = await coloredMarbleResultsIterator.next();
             if (!responseRange || !responseRange.value || !responseRange.value.key) {
                 console.log('end of data');
@@ -235,8 +235,18 @@ class FabCar extends Contract {
 
             console.log(`response range: ${responseRange.value.key}`);
             console.log(`response range string: ${responseRange.value.key.toString('utf8')}`);
-            Record = responseRange.value.key.toString('utf8');
-            relations.push({company, Record});
+            let objectType;
+            let attributes;
+            ({
+                objectType,
+                attributes
+            } = await ctx.stub.splitCompositeKey(responseRange.value.key));
+
+            let companyId = attributes[0];
+            let userId = attributes[1];
+            console.log(`Index Type: ${objectType}`);
+            // Record = responseRange.value.key.toString('utf8');
+            relations.push({companyId, userId});
 
             // if (responseRange.done) {
             //     return;
