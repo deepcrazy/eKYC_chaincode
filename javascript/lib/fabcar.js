@@ -133,6 +133,21 @@ class FabCar extends Contract {
         console.log('======== END : User Data Stored ===========');
     }
 
+    async approveCompany(ctx, userId, companyId) {
+        console.log('======== START : Approve company for user data access ==========');
+        let indexName = 'company~user';
+        let companyUserIndexKey = await ctx.stub.createCompositeKey(indexName, [companyId.toString(), userId.toString()]);
+        if (!companyUserIndexKey) {
+            throw new Error(' Failed to create the createCompositeKey');
+        }
+
+        console.log(companyUserIndexKey);
+
+        //  Note - passing a 'nil' value will effectively delete the key from state, therefore we pass null character as value
+        await ctx.stub.putState(companyUserIndexKey, Buffer.from('\u0000'));
+        console.log('======== END : Relation of approved companies for users stored =========');
+    }
+
     async saveCompany(ctx, companyId) {
         console.log('=========== START : Save Company Data ===========');
 
@@ -200,6 +215,42 @@ class FabCar extends Contract {
                 return JSON.stringify(allResults);
             }
         }
+    }
+
+    async getRelations(ctx, companyID) {
+
+        let companyUserResultsIterator = await ctx.stub.getStateByPartialCompositeKey('company~user', [companyID.toString()]);
+
+        let relations = [];
+        while (true) {
+            // let Record;
+            let responseRange = await companyUserResultsIterator.next();
+            if (!responseRange || !responseRange.value || !responseRange.value.key) {
+                console.log('end of data');
+                console.log(`Relations: ${relations}`);
+                return JSON.stringify(relations);
+            }
+
+            console.log(`response range: ${responseRange.value.key}`);
+            console.log(`response range string: ${responseRange.value.key.toString('utf8')}`);
+            let objectType;
+            let attributes;
+            ({
+                objectType,
+                attributes
+            } = await ctx.stub.splitCompositeKey(responseRange.value.key));
+
+            let companyId = attributes[0];
+            let userId = attributes[1];
+            console.log(`Index Type: ${objectType}`);
+            // Record = responseRange.value.key.toString('utf8');
+            relations.push({companyId, userId});
+
+            // if (responseRange.done) {
+            //     return;
+            // }
+        }
+
     }
 
     // async queryAllCars(ctx) {
