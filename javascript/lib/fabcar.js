@@ -217,16 +217,14 @@ class FabCar extends Contract {
         }
     }
 
-    async getRelations(ctx, company) {
-        // const startKey = '0';
-        // const endKey = '999';
+    async getRelations(ctx, companyID) {
 
-        let coloredMarbleResultsIterator = await ctx.stub.getStateByPartialCompositeKey('company~user', [company.toString()]);
+        let companyUserResultsIterator = await ctx.stub.getStateByPartialCompositeKey('company~user', [companyID.toString()]);
 
         let relations = [];
         while (true) {
             // let Record;
-            let responseRange = await coloredMarbleResultsIterator.next();
+            let responseRange = await companyUserResultsIterator.next();
             if (!responseRange || !responseRange.value || !responseRange.value.key) {
                 console.log('end of data');
                 console.log(`Relations: ${relations}`);
