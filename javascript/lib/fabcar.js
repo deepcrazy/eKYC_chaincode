@@ -217,6 +217,29 @@ class FabCar extends Contract {
         }
     }
 
+    async getRelations(ctx, company) {
+        // const startKey = '0';
+        // const endKey = '999';
+
+        let coloredMarbleResultsIterator = await ctx.stub.getStateByPartialCompositeKey('company~user', [company.toString()]);
+
+        let relations = [];
+        while (true) {
+            let Record;
+            let responseRange = await coloredMarbleResultsIterator.next();
+            if (!responseRange || !responseRange.value || !responseRange.value.key) {
+                return;
+            }
+            console.log(`response range: ${responseRange.value.key}`);
+            console.log(`response range string: ${responseRange.value.key.toString('utf8')}`);
+            Record = responseRange.value.key.toString('utf8');
+            relations.push({id, Record});
+            console.log(`Relations: ${relations}`);
+            return JSON.stringify(relations);
+        }
+
+    }
+
     // async queryAllCars(ctx) {
     //     const startKey = 'CAR0';
     //     const endKey = 'CAR999';
