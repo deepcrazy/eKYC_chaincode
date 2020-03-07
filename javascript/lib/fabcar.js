@@ -168,6 +168,7 @@ class FabCar extends Contract {
             const companyObj = {list: [companyID]};
             console.log(`check: ${JSON.stringify(companyObj)}`);
             await ctx.stub.putState(companies_list_id, Buffer.from(JSON.stringify(companyObj)));
+            return;
         }
 
         console.log(`Companies as bytes: ${companiesAsBytes.toString()}`);
